@@ -6,8 +6,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-
-
 #import "PdfManager.h"
 
 #if __has_include(<React/RCTAssert.h>)
@@ -16,11 +14,9 @@
 #import "React/RCTUtils.h"
 #endif
 
-
 static NSMutableArray *pdfDocRefs = Nil;
 
 @implementation PdfManager
-
 
 #ifndef __OPTIMIZE__
 // only output log when debug
@@ -41,8 +37,7 @@ RCT_EXPORT_METHOD(loadFile:(NSString *)path
                   reject:(RCTPromiseRejectBlock)reject
                   )
 {
-
-    if (pdfDocRefs==Nil) {
+    if (pdfDocRefs == Nil) {
         pdfDocRefs = [NSMutableArray arrayWithCapacity:1];
     }
 
@@ -75,7 +70,6 @@ RCT_EXPORT_METHOD(loadFile:(NSString *)path
                 reject(RCTErrorUnspecified, @"Password required or incorrect password.", nil);
                 return;
             }
-
         }
 
         [pdfDocRefs addObject:[NSValue valueWithPointer:pdfRef]];
@@ -87,14 +81,24 @@ RCT_EXPORT_METHOD(loadFile:(NSString *)path
         
         NSArray *params;
         
-        if (rotation == 90 || rotation==270) {
-             params =@[[NSNumber numberWithUnsignedLong:([pdfDocRefs count]-1)], [NSNumber numberWithInt:numberOfPages], [NSNumber numberWithFloat:pdfPageRect.size.height], [NSNumber numberWithFloat:pdfPageRect.size.width]];
+        if (rotation == 90 || rotation == 270) {
+             params =@[
+                [NSNumber numberWithUnsignedLong:([pdfDocRefs count]-1)],
+                [NSNumber numberWithInt:numberOfPages],
+                [NSNumber numberWithFloat:pdfPageRect.size.height],
+                [NSNumber numberWithFloat:pdfPageRect.size.width]
+            ];
+
             RLog(@"Pdf loaded numberOfPages=%d, fileNo=%lu, pageWidth=%f, pageHeight=%f", numberOfPages, [pdfDocRefs count]-1, pdfPageRect.size.height, pdfPageRect.size.width);
-
         } else {
-            params =@[[NSNumber numberWithUnsignedLong:([pdfDocRefs count]-1)], [NSNumber numberWithInt:numberOfPages], [NSNumber numberWithFloat:pdfPageRect.size.width], [NSNumber numberWithFloat:pdfPageRect.size.height]];
-            RLog(@"Pdf loaded numberOfPages=%d, fileNo=%lu, pageWidth=%f, pageHeight=%f", numberOfPages, [pdfDocRefs count]-1, pdfPageRect.size.width, pdfPageRect.size.height);
+            params =@[
+                [NSNumber numberWithUnsignedLong:([pdfDocRefs count]-1)],
+                [NSNumber numberWithInt:numberOfPages],
+                [NSNumber numberWithFloat:pdfPageRect.size.width],
+                [NSNumber numberWithFloat:pdfPageRect.size.height]
+            ];
 
+            RLog(@"Pdf loaded numberOfPages=%d, fileNo=%lu, pageWidth=%f, pageHeight=%f", numberOfPages, [pdfDocRefs count]-1, pdfPageRect.size.width, pdfPageRect.size.height);
         }
 
         resolve(params);
@@ -108,22 +112,19 @@ RCT_EXPORT_METHOD(loadFile:(NSString *)path
 + (CGPDFDocumentRef) getPdf:(NSUInteger) index
 {
     if (pdfDocRefs && [pdfDocRefs count]>index){
-
         return (CGPDFDocumentRef)[(NSValue *)[pdfDocRefs objectAtIndex:index] pointerValue];
-
     }
 
     return NULL;
 }
 
 - (instancetype)init
-{
-    
+{   
     if ((self = [super init])) {
 
     }
+ 
     return self;
-
 }
 
 + (BOOL)requiresMainQueueSetup
@@ -131,22 +132,21 @@ RCT_EXPORT_METHOD(loadFile:(NSString *)path
     return YES;
 }
 
-
 - (void)dealloc
 {
     // release pdf docs
     for(NSValue *item in pdfDocRefs) {
+        
         CGPDFDocumentRef pdfItem = (CGPDFDocumentRef)[item pointerValue];
+        
         if (pdfItem != NULL) {
 
             CGPDFDocumentRelease(pdfItem);
             pdfItem = NULL;
-
         }
     }
+
     pdfDocRefs = Nil;
-
 }
-
 
 @end

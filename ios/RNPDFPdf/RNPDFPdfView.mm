@@ -267,7 +267,6 @@ using namespace facebook::react;
 
     [self addSubview:_pdfView];
 
-
     // register notification
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(onDocumentChanged:) name:PDFViewDocumentChangedNotification object:_pdfView];
@@ -306,7 +305,6 @@ using namespace facebook::react;
 
         if ([changedProps containsObject:@"path"]) {
 
-
             if (_pdfDocument != Nil) {
                 //Release old doc
                 _pdfDocument = Nil;
@@ -335,7 +333,7 @@ using namespace facebook::react;
 
             if (_pdfDocument) {
 
-                //check need password or not
+                // check need password or not
                 if (_pdfDocument.isLocked && ![_pdfDocument unlockWithPassword:_password]) {
 
                     [self notifyOnChangeWithMessage:@"error|Password required or incorrect password."];
@@ -357,7 +355,8 @@ using namespace facebook::react;
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"spacing"])) {
             if (_horizontal) {
                 _pdfView.pageBreakMargins = UIEdgeInsetsMake(0,_spacing,0,0);
-                if (_spacing==0) {
+                
+                if (_spacing == 0) {
                     if (@available(iOS 12.0, *)) {
                         _pdfView.pageShadowsEnabled = NO;
                     }
@@ -386,9 +385,11 @@ using namespace facebook::react;
 
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"enableAnnotationRendering"])) {
             if (!_enableAnnotationRendering) {
-                for (unsigned long i=0; i<_pdfView.document.pageCount; i++) {
+                for (unsigned long i = 0; i < _pdfView.document.pageCount; i++) {
+
                     PDFPage *pdfPage = [_pdfView.document pageAtIndex:i];
-                    for (unsigned long j=0; j<pdfPage.annotations.count; j++) {
+
+                    for (unsigned long j = 0; j < pdfPage.annotations.count; j++) {
                         pdfPage.annotations[j].shouldDisplay = _enableAnnotationRendering;
                     }
                 }
@@ -418,6 +419,7 @@ using namespace facebook::react;
             } else {
                 float pageAspect = pdfPageRect.size.width/pdfPageRect.size.height;
                 float reactViewAspect = self.frame.size.width/self.frame.size.height;
+                
                 if (reactViewAspect>pageAspect) {
                     _fixScaleFactor = self.frame.size.height/pdfPageRect.size.height;
                     _pdfView.scaleFactor = _scale * _fixScaleFactor;
@@ -430,13 +432,18 @@ using namespace facebook::react;
                     _pdfView.maxScaleFactor = _fixScaleFactor*_maxScale;
                 }
             }
-
         }
 
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"scale"])) {
             _pdfView.scaleFactor = _scale * _fixScaleFactor;
-            if (_pdfView.scaleFactor>_pdfView.maxScaleFactor) _pdfView.scaleFactor = _pdfView.maxScaleFactor;
-            if (_pdfView.scaleFactor<_pdfView.minScaleFactor) _pdfView.scaleFactor = _pdfView.minScaleFactor;
+            
+            if (_pdfView.scaleFactor > _pdfView.maxScaleFactor) {
+                _pdfView.scaleFactor = _pdfView.maxScaleFactor;
+            }
+            
+            if (_pdfView.scaleFactor < _pdfView.minScaleFactor) {
+                _pdfView.scaleFactor = _pdfView.minScaleFactor;
+            }
         }
 
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"horizontal"])) {
@@ -506,6 +513,7 @@ using namespace facebook::react;
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"enablePaging"] || [changedProps containsObject:@"horizontal"] || [changedProps containsObject:@"page"])) {
 
             PDFPage *pdfPage = [_pdfDocument pageAtIndex:_page-1];
+            
             if (pdfPage && _page == 1) {
                 // goToDestination() would be better. However, there is an
                 // error in the pointLeftTop computation that often results in
@@ -536,7 +544,6 @@ using namespace facebook::react;
     }
 }
 
-
 - (void)reactSetFrame:(CGRect)frame
 {
     [super reactSetFrame:frame];
@@ -551,7 +558,6 @@ using namespace facebook::react;
     [self didSetProps:mProps];
 }
 
-
 - (void)notifyOnChangeWithMessage:(NSString *)message
 {
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -564,12 +570,12 @@ using namespace facebook::react;
 #endif
 }
 
-- (void)dealloc{
-
+- (void)dealloc
+{
     _pdfDocument = Nil;
     _pdfView = Nil;
 
-    //Remove notifications
+    // Remove notifications
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PDFViewDocumentChangedNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PDFViewPageChangedNotification" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PDFViewScaleChangedNotification" object:nil];
@@ -584,7 +590,6 @@ using namespace facebook::react;
 #pragma mark notification process
 - (void)onDocumentChanged:(NSNotification *)noti
 {
-
     if (_pdfDocument) {
 
         unsigned long numberOfPages = _pdfDocument.pageCount;
@@ -593,14 +598,13 @@ using namespace facebook::react;
         NSString *jsonString = [self getTableContents];
 
         [self notifyOnChangeWithMessage:
-         [[NSString alloc] initWithString:[NSString stringWithFormat:@"loadComplete|%lu|%f|%f|%@", numberOfPages, pageSize.width, pageSize.height,jsonString]]];
+        
+        [[NSString alloc] initWithString:[NSString stringWithFormat:@"loadComplete|%lu|%f|%f|%@", numberOfPages, pageSize.width, pageSize.height,jsonString]]];
     }
-
 }
 
 -(NSString *) getTableContents
 {
-
     NSMutableArray<PDFOutline *> *arrTableOfContents = [[NSMutableArray alloc] init];
 
     if (_pdfDocument.outlineRoot) {
@@ -628,8 +632,7 @@ using namespace facebook::react;
 
     NSMutableArray *arrParentsContents = [[NSMutableArray alloc] init];
 
-    for ( NSInteger i= 0; i < arrTableOfContents.count; i++ )
-    {
+    for (NSInteger i = 0; i < arrTableOfContents.count; i++) {
         PDFOutline *currentOutline = [arrTableOfContents objectAtIndex:i];
 
         NSInteger indentationLevel = -1;
@@ -671,7 +674,6 @@ using namespace facebook::react;
             [DXChildContent setObject:[NSString stringWithFormat:@"%lu", [_pdfDocument indexForPage:currentOutline.destination.page]] forKey:@"pageIdx"];
             [DXChildContent setObject:currentOutline.label forKey:@"title"];
             [arrChildren addObject:DXChildContent];
-
         }
     }
 
@@ -681,12 +683,10 @@ using namespace facebook::react;
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 
     return jsonString;
-
 }
 
 - (void)onPageChanged:(NSNotification *)noti
 {
-
     if (_pdfDocument) {
         PDFPage *currentPage = _pdfView.currentPage;
         unsigned long page = [_pdfDocument indexForPage:currentPage];
@@ -694,15 +694,13 @@ using namespace facebook::react;
 
         [self notifyOnChangeWithMessage:[[NSString alloc] initWithString:[NSString stringWithFormat:@"pageChanged|%lu|%lu", page+1, numberOfPages]]];
     }
-
 }
 
 - (void)onScaleChanged:(NSNotification *)noti
 {
-
-    if (_initialed && _fixScaleFactor>0) {
-        if (_scale != _pdfView.scaleFactor/_fixScaleFactor) {
-            _scale = _pdfView.scaleFactor/_fixScaleFactor;
+    if (_initialed && _fixScaleFactor > 0) {
+        if (_scale != _pdfView.scaleFactor / _fixScaleFactor) {
+            _scale = _pdfView.scaleFactor / _fixScaleFactor;
             [self notifyOnChangeWithMessage:[[NSString alloc] initWithString:[NSString stringWithFormat:@"scaleChanged|%f", _scale]]];
         }
     }

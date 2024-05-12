@@ -23,8 +23,7 @@ RCT_EXPORT_MODULE()
         return [[RNPDFPdfView alloc] initWithBridge:self.bridge];
     } else {
         return NULL;
-    }
-  
+    }  
 }
 
 RCT_EXPORT_VIEW_PROPERTY(path, NSString);
@@ -56,12 +55,13 @@ RCT_EXPORT_METHOD(supportPDFKit:(RCTResponseSenderBlock)callback)
     
 }
 
-+ (BOOL)requiresMainQueueSetup {
++ (BOOL)requiresMainQueueSetup
+{
     return YES;
 }
 
-
-- (void)dealloc{
+- (void)dealloc
+{
 }
 
 @end

@@ -9,8 +9,6 @@
 #import "PdfManager.h"
 #import "RNPDFPdfPageView.h"
 
-
-
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
 
@@ -51,13 +49,12 @@
 }
 
 - (void)drawInContext:(CGContextRef)context
-{
-    
+{    
     CGRect _viewFrame = _parentView.frame;
     CGPDFDocumentRef pdfRef= [PdfManager getPdf:_parentView.fileNo];
-    if (pdfRef!=NULL)
-    {
-        
+
+    if (pdfRef != NULL)
+    {        
         CGPDFPageRef pdfPage = CGPDFDocumentGetPage(pdfRef, _parentView.page);
         
         if (pdfPage != NULL) {
@@ -85,9 +82,7 @@
                 scale = _viewFrame.size.width/pdfPageRect.size.width;
             }
             CGContextScaleCTM(context, scale, scale);
-            
-            
-            
+
             switch (rotation) {
                 case 0:
                     if (_viewFrame.size.width/_viewFrame.size.height>=pdfPageRect.size.width/pdfPageRect.size.height) {
@@ -123,19 +118,16 @@
                     }
                 default:
                     break;
-            }
-            
+            }            
             
             // draw the content to context
             CGContextDrawPDFPage(context, pdfPage);
-        }
-        
+        }        
     }
 }
 @end
 
 @implementation RNPDFPdfPageView {
-    
     CAPdfLayer         *_layer;
 }
 
@@ -167,7 +159,6 @@
     [self.layer setNeedsDisplay];
 }
 
-
 - (void)reactSetFrame:(CGRect)frame
 {
     [super reactSetFrame:frame];
@@ -178,7 +169,8 @@
     [self.layer setNeedsDisplay];
 }
 
-- (void)dealloc{
+- (void)dealloc
+{
 
 }
 
